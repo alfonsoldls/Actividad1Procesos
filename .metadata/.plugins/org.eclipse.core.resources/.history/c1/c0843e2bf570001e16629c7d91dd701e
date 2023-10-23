@@ -1,0 +1,10 @@
+package hilos_y_sockets_servidor;
+
+public class HiloServidor {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+
+}

@@ -1,0 +1,44 @@
+package hilos_y_sockets_cliente;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.Scanner;
+
+public class Cliente {
+
+	public static final int PUERTO = 2017;
+	public static final String IP_SERVER = "localhost";
+	
+	public static void main(String[] args) {
+		System.out.println("               MENÚ                ");
+		System.out.println("-----------------------------------");
+		System.out.println("1. Consultar película por ID       ");
+		System.out.println("2. Consultar película por título   ");
+		System.out.println("3. Consultar películas por director");
+		System.out.println("4. Salir de la aplicación          ");
+		
+		InetSocketAddress direccionServidor = new InetSocketAddress(IP_SERVER, PUERTO);
+		
+		try (Scanner sc = new Scanner(System.in);
+				Socket socketAlServidor = new Socket()){
+			
+		} catch (UnknownHostException e) {
+			System.err.println("CLIENTE: No encuentro el servidor en la dirección" + IP_SERVER);
+			e.printStackTrace();
+		} catch (IOException e) {
+			System.err.println("CLIENTE: Error de entrada/salida");
+			e.printStackTrace();
+		} catch (Exception e) {
+			System.err.println("CLIENTE: Error -> " + e);
+			e.printStackTrace();
+		}
+		
+		System.out.println("CLIENTE: Fin del programa");
+	
+	}
+}

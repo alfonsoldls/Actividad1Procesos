@@ -1,0 +1,101 @@
+package hilos_y_sockets_cliente;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.Scanner;
+
+public class Cliente {
+
+	public static final int PUERTO = 2017;
+	public static final String IP_SERVER = "localhost";
+	
+	public static void main(String[] args) {
+		System.out.println("               MENÚ                ");
+		System.out.println("-----------------------------------");
+		System.out.println("1. Consultar película por ID       ");
+		System.out.println("2. Consultar película por título   ");
+		System.out.println("3. Consultar películas por director");
+		System.out.println("4. Salir de la aplicación          ");
+		
+		InetSocketAddress direccionServidor = new InetSocketAddress(IP_SERVER, PUERTO);
+		
+		try (Scanner sc = new Scanner(System.in);
+				Socket socketAlServidor = new Socket()){
+			
+			Scanner scanner = new Scanner(System.in);
+			int opcion;
+
+	        while (true) {
+	            System.out.println("Seleccione una opción (1-4):");
+	            System.out.println("1. Buscar por ID");
+	            System.out.println("2. Buscar por título");
+	            System.out.println("3. Buscar por director");
+	            System.out.println("4. Salir");
+
+	            // Verificar que la entrada es un entero
+	            while (!scanner.hasNextInt()) {
+	                System.out.println("Por favor, introduzca un número entero.");
+	                scanner.next(); // Descartar entrada no válida
+	            }
+
+	            opcion = scanner.nextInt();
+
+	            switch (opcion) {
+	                case 1:
+	                    System.out.println("Introduzca el ID de la película:");
+	                    while (!scanner.hasNextInt()) {
+	                        System.out.println("Está mal. Introduzca un número entero para el ID:");
+	                        scanner.next(); // Descartar entrada no válida
+	                    }
+	                    int id = scanner.nextInt();
+	                    System.out.println("Buscar película con ID: " + id);
+	                    // Aquí puedes agregar el código para buscar la película por ID
+	                    break;
+
+	                case 2:
+	                    System.out.println("Introduzca el título de la película:");
+	                    scanner.nextLine(); // Consumir el salto de línea pendiente
+	                    String titulo = scanner.nextLine();
+	                    System.out.println("Buscar película con título: " + titulo);
+	                    // Aquí puedes agregar el código para buscar la película por título
+	                    break;
+
+	                case 3:
+	                    System.out.println("Introduzca el director de la película:");
+	                    scanner.nextLine(); // Consumir el salto de línea pendiente
+	                    String director = scanner.nextLine();
+	                    System.out.println("Buscar películas dirigidas por: " + director);
+	                    // Aquí puedes agregar el código para buscar la película por director
+	                    break;
+
+	                case 4:
+	                    System.out.println("Fin del programa.");
+	                    System.exit(0); // Salir del programa
+	                    break;
+
+	                default:
+	                    System.out.println("Opción no válida. Por favor, seleccione una opción del 1 al 4.");
+	                    break;
+	            }
+	        }
+			
+		} catch (UnknownHostException e) {
+			System.err.println("CLIENTE: No encuentro el servidor en la dirección" + IP_SERVER);
+			e.printStackTrace();
+		} catch (IOException e) {
+			System.err.println("CLIENTE: Error de entrada/salida");
+			e.printStackTrace();
+		} catch (Exception e) {
+			System.err.println("CLIENTE: Error -> " + e);
+			e.printStackTrace();
+		}
+		
+		System.out.println("CLIENTE: Fin del programa");
+	
+	}
+}

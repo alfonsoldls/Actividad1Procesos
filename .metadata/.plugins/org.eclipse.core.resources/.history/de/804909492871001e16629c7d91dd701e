@@ -1,0 +1,200 @@
+package hilos_y_sockets_cliente;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.Scanner;
+
+public class Cliente {
+
+    // Constantes para la dirección IP y el puerto del servidor
+	public static final int PUERTO = 9999;
+	public static final String IP_SERVER = "localhost";
+	
+	public static void main(String[] args) {
+		// Imprimiendo la bienvenida al usuario
+		System.out.println("      APLICACIÓN DEL CLIENTE       ");
+		System.out.println("-----------------------------------");
+
+		// Creando una dirección de socket para conectar al servidor
+		InetSocketAddress direccionServidor = new InetSocketAddress(IP_SERVER, PUERTO);
+		
+		// Inicializando variables para almacenar información y peticiones del usuario
+		String peticion = "";
+		String id = "";
+		String titulo = "";
+		String director = "";
+		String precio = "";
+		String busqueda = "";
+		
+		// Abriendo un scanner para leer la entrada del usuario
+		try (Scanner sc = new Scanner(System.in);){
+
+			String opcion = "";			
+			Boolean continuar = true;
+			String respuesta = "";
+			
+			// Estableciendo conexión con el servidor
+			Socket socketToServer = new Socket();
+			socketToServer.connect(direccionServidor);
+			
+			// Enviando la petición al servidor
+			PrintStream salida = new PrintStream(socketToServer.getOutputStream());
+
+			// Recibiendo la respuesta del servidor
+			InputStreamReader entrada = new InputStreamReader(socketToServer.getInputStream());
+			BufferedReader bf = new BufferedReader(entrada);
+			
+			while (continuar) {		
+                // Imprimiendo el menú de opciones para el usuario
+				System.out.println("               MENÚ                ");
+				System.out.println("-----------------------------------");
+				System.out.println("1. Consultar película por ID       ");
+				System.out.println("2. Consultar película por título   ");
+				System.out.println("3. Consultar películas por director");
+				System.out.println("4. Añadir película                 ");
+				System.out.println("5. Salir de la aplicación          ");
+				System.out.println("                                   ");
+				System.out.println("Seleccione una opción:");
+				
+				// Leyendo la opción seleccionada por el usuario
+				opcion = sc.nextLine();
+				
+				// Procesando la opción seleccionada
+				switch(opcion) {
+					case "1":
+						// Pidiendo al usuario el ID de la película
+						System.out.println("Introduzca el ID de la película que desea buscar:");
+						peticion = sc.nextLine();
+						break;
+					
+					case "2":
+						// Pidiendo al usuario el título de la película
+						System.out.println("Introduzca el título de la película que desea buscar:");
+						peticion = sc.nextLine();
+						break;
+						
+					case "3":
+						// Pidiendo al usuario el nombre del director
+						System.out.println("Introduzca el director de la/s película/s que desea buscar:");
+						peticion = sc.nextLine();
+						break;
+						
+					case "4":
+						// Proceso para añadir una nueva película
+						int idNumerico = 0;
+				        boolean esEntero = false;
+
+				        // Verificando que el ID sea un entero
+				        while (!esEntero) {
+				            // Solicitando el ID de la nueva película
+				            System.out.println("Introduzca el ID de la película que desea añadir:");
+				            id = sc.nextLine();
+
+				            // Verificando si el ID es un número entero
+				            try {
+				                idNumerico = Integer.parseInt(id);
+				                esEntero = true;
+				            } catch (NumberFormatException e) {
+				                // Mensaje de error si el ID no es un número entero
+				                System.out.println("El ID introducido no es un número entero. Inténtalo de nuevo.");
+				            }
+				        }
+						
+				        // Solicitando más información sobre la película
+						System.out.println("Introduzca el título de la película que desea añadir:");
+						titulo = sc.nextLine();
+						
+						System.out.println("Introduzca el director de la película que desea añadir:");
+						director = sc.nextLine();
+
+						// Verificando que el precio sea un número decimal
+						double precioNumerico = 0.0;
+				        boolean esDouble = false;
+
+				        // Solicitando el precio hasta que se reciba un número decimal válido
+				        while (!esDouble) {
+				            System.out.println("Introduzca el precio de la película que desea añadir:");
+				            precio = sc.nextLine();
+
+				            try {
+				            	precioNumerico = Double.parseDouble(precio);
+				            	esDouble = true;
+				            } catch (NumberFormatException e) {
+				                System.out.println("El precio introducido no es un número válido. Inténtalo de nuevo.");
+				            }
+				        }
+				        
+				        // Concatenando los detalles de la nueva película
+				        peticion = id + "-" + titulo + "-" + director + "-" + precio;
+						break;
+						
+					case "5":
+						// Mensaje de despedida antes de salir del programa
+						System.out.println("Saliendo del programa...");
+						break;
+						
+					default:
+						// Mensaje de error para opciones inválidas
+						System.out.println("Introduzca una opción válida:");
+						break;		
+				}
+				
+				// Proceso para comunicarse con el servidor y obtener resultados
+				if (opcion.equals("1") || opcion.equals("2") || opcion.equals("3") || opcion.equals("4") || opcion.equals("5")) {
+					
+					busqueda = opcion +"-"+peticion;
+					
+					// Enviando la petición al servidor
+					salida.println(busqueda);
+					
+					// Recibiendo la respuesta del servidor
+					respuesta = bf.readLine();
+					
+					// Procesando y mostrando la respuesta del servidor
+					if (opcion.equals("3")) {
+						String[] respuestaDirectores = respuesta.split("&");
+						if (respuesta.equalsIgnoreCase("No se encontró la película con el director especificado.")) {
+							System.out.println(respuesta);
+						}else {
+							for (int i = 0; i<respuestaDirectores.length; i++) {
+								String[] peliculaDirectores = respuestaDirectores[i].split("-");
+								System.out.println("ID: " + peliculaDirectores[0] + " - Título: " + peliculaDirectores[1] + " - Director: " + peliculaDirectores[2] + " - Precio: " + peliculaDirectores[3] + "€");
+							}
+						}
+					}else {
+						System.out.println(respuesta);
+					}
+					
+					if (respuesta.equalsIgnoreCase("Hasta pronto")) {
+						// Cerrando el bucle while
+						continuar = false;
+					}
+					
+				}
+						
+			} 
+			// Cerrando el socket
+			socketToServer.close();
+			
+			// Manejando excepciones
+			}catch (UnknownHostException e) {
+				System.err.println("No encuentro el servidor en la dirección" + IP_SERVER);
+				e.printStackTrace();
+			} catch (IOException e) {
+				System.err.println("Error de entrada/salida");
+				e.printStackTrace();
+			} catch (Exception e) {
+				System.err.println("Error -> " + e);
+				e.printStackTrace();
+			}
+			
+			// Mensaje indicando el fin del programa
+			System.out.println("Fin del programa");
+		}
+
+	}

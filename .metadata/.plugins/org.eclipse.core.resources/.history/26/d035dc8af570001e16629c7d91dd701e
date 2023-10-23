@@ -1,0 +1,46 @@
+package hilos_y_sockets_servidor;
+
+import java.io.*;
+import java.net.*;
+import java.util.*;
+import peliculas.Pelicula;
+
+public class Servidor {
+
+	public static final int PUERTO = 9999;
+	
+
+
+	public static void main(String[] args) {
+		
+		
+	
+		System.out.println("      APLICACIÓN DEL SERVIDOR      ");
+		System.out.println("-----------------------------------");
+		
+		int peticion = 0;
+		
+		try (ServerSocket serverSocket = new ServerSocket()){
+			
+			InetSocketAddress direccion = new InetSocketAddress(PUERTO);
+			serverSocket.bind(direccion);
+			
+			while(true) {
+				
+				Socket socketToClient = serverSocket.accept();
+				System.out.println("Petición número "+ ++peticion +" recibida.");
+				
+				new HiloServidor(socketToClient);
+			}
+			
+		} catch (IOException e) {
+			System.err.println("SERVIDOR: Error de entrada/salida");
+			e.printStackTrace();
+		} catch (Exception e) {
+			System.err.println("SERVIDOR: Error");
+			e.printStackTrace();
+		}
+		
+	}
+
+}
